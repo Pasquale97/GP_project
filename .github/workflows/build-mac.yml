@@ -1,0 +1,34 @@
+name: Build Mac App
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch: # Permette di avviare la build manualmente
+
+jobs:
+  build-mac:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout del codice
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Installazione Dipendenze
+        run: npm install
+
+      - name: Compilazione Progetto
+        run: npm run build
+
+      - name: Creazione Eseguibile Mac
+        run: npx electron-builder --mac
+
+      - name: Carica Eseguibile Mac come Artifatto
+        uses: actions/upload-artifact@v3
+        with:
+          name: Mac-App-Gennaro
+          path: dist/*.dmg

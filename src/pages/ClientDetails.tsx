@@ -161,7 +161,7 @@ export default function ClientDetails() {
       const H = pdf.internal.pageSize.getHeight() // 210mm
       const marginL = 15
       const marginR = 15
-      const plotW = W - marginL - marginR
+      // const plotW = W - marginL - marginR
 
       // ── Header ──────────────────────────────────────────────
       pdf.setFontSize(16)

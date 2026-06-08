@@ -1,5 +1,5 @@
 {
-  "name": "trainer-app",
+  "name": "GP Tracker",
   "private": true,
   "version": "0.0.0",
   "main": "dist-electron/main.js",
@@ -20,6 +20,15 @@
     "react-router-dom": "^7.17.0",
     "recharts": "^3.8.1",
     "tailwind-merge": "^3.6.0"
+  },
+  "build": {
+    "appId": "com.gp.trainerapp",
+    "mac": {
+      "target": ["dmg"]
+    },
+    "dmg": {
+      "artifactName": "GPTracker.${ext}"
+    }
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

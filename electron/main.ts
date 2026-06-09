@@ -3,6 +3,10 @@ import path from 'node:path'
 import Database from 'better-sqlite3'
 import fs from 'node:fs'
 
+const isPackaged = app.isPackaged;
+const DIST = isPackaged 
+  ? path.join(process.resourcesPath, 'app.asar', 'dist')
+  : path.join(__dirname, '../dist');
 // Set up SQLite database in user data folder
 const dbPath = path.join(app.getPath('userData'), 'trainer_database.sqlite')
 const db = new Database(dbPath)
@@ -92,11 +96,11 @@ function createWindow() {
     width: 1200,
     height: 800,
     webPreferences: {
+      // Questo va bene assoluto perché serve a Electron prima di lanciare il browser
       preload: path.join(__dirname, 'preload.js'),
     },
   })
 
-  // Test active push message to Renderer-process.
   win.webContents.on('did-finish-load', () => {
     win?.webContents.send('main-process-message', (new Date).toLocaleString())
   })
@@ -104,8 +108,9 @@ function createWindow() {
   if (process.env.VITE_DEV_SERVER_URL) {
     win.loadURL(process.env.VITE_DEV_SERVER_URL)
   } else {
-    // win.loadFile('dist/index.html')
-    win.loadFile(path.join(__dirname, '../dist/index.html'))
+    // LA SVOLTA: Nessun __dirname, nessun file://. 
+    // Solo il percorso relativo pulito. Electron gestirà l'ASAR in totale sicurezza.
+    win.loadFile('dist/index.html')
   }
 }
 

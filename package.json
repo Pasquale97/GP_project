@@ -23,6 +23,10 @@
   },
   "build": {
     "appId": "com.gp.trainerapp",
+    "files": [
+      "dist",
+      "dist-electron"
+    ],
     "mac": {
       "target": ["dmg"]
     },

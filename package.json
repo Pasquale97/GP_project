@@ -12,7 +12,6 @@
   "dependencies": {
     "better-sqlite3": "^12.10.0",
     "clsx": "^2.1.1",
-    "html2canvas": "^1.4.1",
     "jspdf": "^4.2.1",
     "lucide-react": "^1.17.0",
     "react": "^19.2.6",
@@ -28,7 +27,8 @@
       "dist-electron"
     ],
     "mac": {
-      "target": ["dmg"]
+      "target": ["dmg"],
+      "icon": "assets/icon.icns"
     },
     "dmg": {
       "artifactName": "GPTracker.${ext}"

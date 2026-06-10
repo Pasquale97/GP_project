@@ -3,11 +3,13 @@ import path from 'node:path'
 import Database from 'better-sqlite3'
 import fs from 'node:fs'
 
-const isPackaged = app.isPackaged;
-const DIST = isPackaged 
-  ? path.join(process.resourcesPath, 'app.asar', 'dist')
-  : path.join(__dirname, '../dist');
-// Set up SQLite database in user data folder
+// Icon: in dev mode __dirname is dist-electron/, so go up one level to project root
+// In production, electron-builder handles icon via package.json build config
+const ICON_PATH = app.isPackaged
+  ? undefined // electron-builder embeds icon automatically from build config
+  : path.join(__dirname, '../assets/icon.icns')
+
+  // Set up SQLite database in user data folder
 const dbPath = path.join(app.getPath('userData'), 'trainer_database.sqlite')
 const db = new Database(dbPath)
 
@@ -95,6 +97,7 @@ function createWindow() {
   win = new BrowserWindow({
     width: 1200,
     height: 800,
+    icon: ICON_PATH,
     webPreferences: {
       // Questo va bene assoluto perché serve a Electron prima di lanciare il browser
       preload: path.join(__dirname, 'preload.js'),

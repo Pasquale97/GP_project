@@ -28,7 +28,8 @@
     ],
     "mac": {
       "target": ["dmg"],
-      "icon": "assets/icon.icns"
+      "icon": "assets/icon.icns",
+      "identity" : null
     },
     "dmg": {
       "artifactName": "GPTracker.${ext}"

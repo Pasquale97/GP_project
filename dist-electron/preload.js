@@ -1,1 +1,13 @@
-let e=require("electron");e.contextBridge.exposeInMainWorld(`electronAPI`,{getClients:()=>e.ipcRenderer.invoke(`get-clients`),addClient:t=>e.ipcRenderer.invoke(`add-client`,t),getClientWeights:t=>e.ipcRenderer.invoke(`get-client-weights`,t),addWeight:t=>e.ipcRenderer.invoke(`add-weight`,t),updateClient:t=>e.ipcRenderer.invoke(`update-client`,t),deleteClient:t=>e.ipcRenderer.invoke(`delete-client`,t),updateWeight:t=>e.ipcRenderer.invoke(`update-weight`,t),deleteWeight:t=>e.ipcRenderer.invoke(`delete-weight`,t)});
+let electron = require("electron");
+//#region electron/preload.ts
+electron.contextBridge.exposeInMainWorld("electronAPI", {
+	getClients: () => electron.ipcRenderer.invoke("get-clients"),
+	addClient: (client) => electron.ipcRenderer.invoke("add-client", client),
+	getClientWeights: (clientId) => electron.ipcRenderer.invoke("get-client-weights", clientId),
+	addWeight: (record) => electron.ipcRenderer.invoke("add-weight", record),
+	updateClient: (client) => electron.ipcRenderer.invoke("update-client", client),
+	deleteClient: (id) => electron.ipcRenderer.invoke("delete-client", id),
+	updateWeight: (record) => electron.ipcRenderer.invoke("update-weight", record),
+	deleteWeight: (id) => electron.ipcRenderer.invoke("delete-weight", id)
+});
+//#endregion

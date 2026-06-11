@@ -1,4 +1,34 @@
-var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=Object.getOwnPropertyNames,i=Object.getPrototypeOf,a=Object.prototype.hasOwnProperty,o=(e,i,o,s)=>{if(i&&typeof i==`object`||typeof i==`function`)for(var c=r(i),l=0,u=c.length,d;l<u;l++)d=c[l],!a.call(e,d)&&d!==o&&t(e,d,{get:(e=>i[e]).bind(null,d),enumerable:!(s=n(i,d))||s.enumerable});return e},s=(n,r,a)=>(a=n==null?{}:e(i(n)),o(r||!n||!n.__esModule?t(a,`default`,{value:n,enumerable:!0}):a,n));let c=require("electron"),l=require("node:path");l=s(l);let u=require("better-sqlite3");u=s(u),c.app.isPackaged?l.default.join(process.resourcesPath,`app.asar`,`dist`):l.default.join(__dirname,`../dist`);var d=new u.default(l.default.join(c.app.getPath(`userData`),`trainer_database.sqlite`));d.exec(`
+//#region \0rolldown/runtime.js
+var __create = Object.create;
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __copyProps = (to, from, except, desc) => {
+	if (from && typeof from === "object" || typeof from === "function") for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
+		key = keys[i];
+		if (!__hasOwnProp.call(to, key) && key !== except) __defProp(to, key, {
+			get: ((k) => from[k]).bind(null, key),
+			enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+		});
+	}
+	return to;
+};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", {
+	value: mod,
+	enumerable: true
+}) : target, mod));
+//#endregion
+let electron = require("electron");
+let node_path = require("node:path");
+node_path = __toESM(node_path);
+let better_sqlite3 = require("better-sqlite3");
+better_sqlite3 = __toESM(better_sqlite3);
+//#region electron/main.ts
+var ICON_PATH = electron.app.isPackaged ? void 0 : node_path.default.join(__dirname, "../assets/icon.icns");
+var db = new better_sqlite3.default(node_path.default.join(electron.app.getPath("userData"), "trainer_database.sqlite"));
+db.exec(`
   CREATE TABLE IF NOT EXISTS clients (
     id TEXT PRIMARY KEY,
     first_name TEXT NOT NULL,
@@ -18,4 +48,67 @@ var e=Object.create,t=Object.defineProperty,n=Object.getOwnPropertyDescriptor,r=
     notes TEXT,
     FOREIGN KEY(client_id) REFERENCES clients(id) ON DELETE CASCADE
   );
-`);try{d.pragma(`table_info(weight_records)`).some(e=>e.name===`kcal`)||d.exec(`ALTER TABLE weight_records ADD COLUMN kcal INTEGER DEFAULT 0;`)}catch(e){console.error(`Migration error:`,e)}c.ipcMain.handle(`get-clients`,()=>d.prepare(`SELECT * FROM clients ORDER BY created_at DESC`).all()),c.ipcMain.handle(`add-client`,(e,t)=>(d.prepare(`INSERT INTO clients (id, first_name, last_name, email, phone, notes) VALUES (@id, @first_name, @last_name, @email, @phone, @notes)`).run(t),t)),c.ipcMain.handle(`get-client-weights`,(e,t)=>d.prepare(`SELECT * FROM weight_records WHERE client_id = ? ORDER BY record_date ASC`).all(t)),c.ipcMain.handle(`add-weight`,(e,t)=>(d.prepare(`INSERT INTO weight_records (id, client_id, weight, record_date, kcal, notes) VALUES (@id, @client_id, @weight, @record_date, @kcal, @notes)`).run({...t,kcal:t.kcal||0}),t)),c.ipcMain.handle(`update-client`,(e,t)=>(d.prepare(`UPDATE clients SET first_name = @first_name, last_name = @last_name, email = @email, phone = @phone, notes = @notes WHERE id = @id`).run(t),t)),c.ipcMain.handle(`delete-client`,(e,t)=>(d.prepare(`DELETE FROM clients WHERE id = ?`).run(t),t)),c.ipcMain.handle(`update-weight`,(e,t)=>(d.prepare(`UPDATE weight_records SET weight = @weight, record_date = @record_date, kcal = @kcal, notes = @notes WHERE id = @id`).run({...t,kcal:t.kcal||0}),t)),c.ipcMain.handle(`delete-weight`,(e,t)=>(d.prepare(`DELETE FROM weight_records WHERE id = ?`).run(t),t));var f;function p(){f=new c.BrowserWindow({width:1200,height:800,webPreferences:{preload:l.default.join(__dirname,`preload.js`)}}),f.webContents.on(`did-finish-load`,()=>{f?.webContents.send(`main-process-message`,new Date().toLocaleString())}),process.env.VITE_DEV_SERVER_URL?f.loadURL(process.env.VITE_DEV_SERVER_URL):f.loadFile(`dist/index.html`)}c.app.on(`window-all-closed`,()=>{process.platform!==`darwin`&&(c.app.quit(),f=null)}),c.app.whenReady().then(p);
+`);
+try {
+	if (!db.pragma("table_info(weight_records)").some((col) => col.name === "kcal")) db.exec("ALTER TABLE weight_records ADD COLUMN kcal INTEGER DEFAULT 0;");
+} catch (e) {
+	console.error("Migration error:", e);
+}
+electron.ipcMain.handle("get-clients", () => {
+	return db.prepare("SELECT * FROM clients ORDER BY created_at DESC").all();
+});
+electron.ipcMain.handle("add-client", (_, client) => {
+	db.prepare("INSERT INTO clients (id, first_name, last_name, email, phone, notes) VALUES (@id, @first_name, @last_name, @email, @phone, @notes)").run(client);
+	return client;
+});
+electron.ipcMain.handle("get-client-weights", (_, clientId) => {
+	return db.prepare("SELECT * FROM weight_records WHERE client_id = ? ORDER BY record_date ASC").all(clientId);
+});
+electron.ipcMain.handle("add-weight", (_, record) => {
+	db.prepare("INSERT INTO weight_records (id, client_id, weight, record_date, kcal, notes) VALUES (@id, @client_id, @weight, @record_date, @kcal, @notes)").run({
+		...record,
+		kcal: record.kcal || 0
+	});
+	return record;
+});
+electron.ipcMain.handle("update-client", (_, client) => {
+	db.prepare("UPDATE clients SET first_name = @first_name, last_name = @last_name, email = @email, phone = @phone, notes = @notes WHERE id = @id").run(client);
+	return client;
+});
+electron.ipcMain.handle("delete-client", (_, id) => {
+	db.prepare("DELETE FROM clients WHERE id = ?").run(id);
+	return id;
+});
+electron.ipcMain.handle("update-weight", (_, record) => {
+	db.prepare("UPDATE weight_records SET weight = @weight, record_date = @record_date, kcal = @kcal, notes = @notes WHERE id = @id").run({
+		...record,
+		kcal: record.kcal || 0
+	});
+	return record;
+});
+electron.ipcMain.handle("delete-weight", (_, id) => {
+	db.prepare("DELETE FROM weight_records WHERE id = ?").run(id);
+	return id;
+});
+var win;
+function createWindow() {
+	win = new electron.BrowserWindow({
+		width: 1200,
+		height: 800,
+		icon: ICON_PATH,
+		webPreferences: { preload: node_path.default.join(__dirname, "preload.js") }
+	});
+	win.webContents.on("did-finish-load", () => {
+		win?.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString());
+	});
+	if (process.env.VITE_DEV_SERVER_URL) win.loadURL(process.env.VITE_DEV_SERVER_URL);
+	else win.loadFile("dist/index.html");
+}
+electron.app.on("window-all-closed", () => {
+	if (process.platform !== "darwin") {
+		electron.app.quit();
+		win = null;
+	}
+});
+electron.app.whenReady().then(createWindow);
+//#endregion

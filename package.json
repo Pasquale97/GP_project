@@ -26,6 +26,9 @@
       "dist",
       "dist-electron"
     ],
+    "win": {
+      "icon": "public/logo-watermark.png"
+    },
     "mac": {
       "target": ["dmg"],
       "icon": "assets/icon.icns",

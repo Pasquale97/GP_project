@@ -97,3 +97,41 @@
     @apply bg-background text-foreground font-sans antialiased;
   }
 }
+
+/* ==========================================================================
+   WATERMARK LOGO DIETRO IL GRAFICO (SUPPORTA TEMA CHIARO / SCURO)
+   ========================================================================== */
+
+.graph-watermark {
+  position: relative;
+}
+
+/* Genera il logo in background sfruttando un pseudo-elemento */
+.graph-watermark::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 260px; /* Dimensione dello scudo nel grafico dell'app */
+  height: 260px;
+  background-image: url('/logo-watermark.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  pointer-events: none; /* Evita di bloccare i passaggi del mouse sui punti del grafico */
+  z-index: 0;
+  transition: opacity 0.3s ease, filter 0.3s ease;
+}
+
+/* Impostazioni per il TEMA CHIARO (default) */
+.graph-watermark::before {
+  opacity: 0.06; /* Visibilità minima (6%) per fare da sfondo discreto */
+}
+
+/* Impostazioni per il TEMA SCURO */
+/* Si aggancia perfettamente alla classe .dark che già definisce le tue variabili di base */
+.dark .graph-watermark::before {
+  opacity: 0.04; /* Leggermente meno opaco sul nero per bilanciare il contrasto */
+  filter: brightness(0) invert(1); /* Trasforma i pixel blu scuro in bianco puro */
+}

@@ -209,6 +209,32 @@ export default function ClientDetails() {
       const xEnd        = W - marginR - 26
       const plotActualW = xEnd - yAxisLeft
 
+      // ── INSERIMENTO WATERMARK LOGO DIETRO IL GRAFICO DEL PDF ──
+      // Calcoliamo il centro esatto dell'area in cui verrà disegnato il grafico
+      const chartCenterX = yAxisLeft + (plotActualW / 2);
+      const chartCenterY = chartTop + (chartHeight / 2);
+      const logoSize = 120; // Dimensione in millimetri dello scudo nel PDF
+
+      // Salviamo lo stato grafico per isolare la trasparenza
+      pdf.saveGraphicsState();
+      
+      // Impostiamo l'opacità molto bassa (0.06 = 6%) così fa da perfetto sfondo senza coprire i dati
+      pdf.setGState(pdf.GState({ opacity: 0.06 })); 
+      
+      // Essendo in Electron, jsPDF può leggere il file direttamente dalla cartella public usando il percorso relativo
+      pdf.addImage(
+        '/logo-watermark.png', 
+        'PNG', 
+        chartCenterX - (logoSize / 2), 
+        chartCenterY - (logoSize / 2), 
+        logoSize, 
+        logoSize
+      );
+      
+      // Ripristiniamo lo stato grafico (riporta l'opacità al 100% per i testi e le linee successive)
+      pdf.restoreGraphicsState(); 
+      // ─────────────────────────────────────────────────────────
+
       // Compute weight domain
       const weights_vals = chartData.map(d => d.peso)
       const kcal_vals    = chartData.map(d => d.kcal).filter(v => v > 0)
@@ -519,7 +545,7 @@ export default function ClientDetails() {
               </div>
             )}
 
-            <div className="w-full" style={{ height: 360 }}>
+            <div className="w-full graph-watermark" style={{ height: 360 }}>
               {chartData.length > 0 ? (
                 <ResponsiveContainer width="100%" height={360}>
                   <LineChart data={chartData} margin={{ top: 10, right: 20, left: -10, bottom: 0 }}>
